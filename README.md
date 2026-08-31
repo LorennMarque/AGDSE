@@ -1,6 +1,6 @@
 # AGDSE — Notebook compartido
 
-Editor tipo notebook (archivo custom `.agdnb`) con celdas Python, output en vivo, carga de carpetas y cursores compartidos por WebSocket.
+Editor colaborativo sobre notebooks Jupyter (`.ipynb`) con proyectos, cuentas, amigos e invitaciones por código.
 
 ## Arrancar
 
@@ -14,28 +14,14 @@ python app.py
 - Local: `http://127.0.0.1:5000`
 - Red local: el link que imprime la consola (misma Wi‑Fi)
 
-## Formato `.agdnb`
+## Uso
 
-JSON propio del proyecto:
+1. Entrá como **Guest** (por defecto).
+2. Unite a un proyecto con un **código de invitación**, o creá una **cuenta** (nombre, color, password).
+3. Con cuenta: creá proyectos, agregá amigos e invitalos.
+4. Al abrir un proyecto ves el editor de notebooks. La colaboración (cursores, chat, celdas) es solo dentro de ese proyecto.
 
-```json
-{
-  "format": "agdnb",
-  "version": 1,
-  "title": "Intro",
-  "cells": [
-    {
-      "id": "abc123",
-      "type": "code",
-      "source": "print('hola')",
-      "outputs": [],
-      "status": "idle"
-    }
-  ]
-}
-```
-
-Los notebooks viven en `workspace/`. Podés cargar una carpeta entera desde la UI.
+Los archivos de cada proyecto viven en `projects/<id>/`. Cuentas y metadata en `data/`.
 
 ## Atajos
 
