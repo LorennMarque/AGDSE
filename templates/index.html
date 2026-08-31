@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AGDSE</title>
+  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/png" />
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -12,40 +14,229 @@
 <body>
   <div id="cursors" aria-hidden="true"></div>
 
-  <div class="app">
+  <!-- HOME -->
+  <div id="home" class="home">
+    <div class="home-stage">
+      <header class="home-hero">
+        <img class="home-logo-img" src="{{ url_for('static', filename='logo.png') }}" alt="AGDSE" width="56" height="56" />
+        <div class="home-hero-right">
+          <div class="home-brand">AGDSE</div>
+          <div class="home-sub">
+            <span class="home-dot avatar" id="home-dot"></span>
+            <span id="home-who">Guest</span>
+            <span class="home-sep">·</span>
+            <button type="button" class="home-link" id="btn-home-account">Account</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="home-actions">
+        <button type="button" class="home-tile" id="btn-new-project">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 5v14M5 12h14"/></svg>
+          <span>New project</span>
+        </button>
+        <button type="button" class="home-tile" id="btn-join-session">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 3h4a2 2 0 0 1 2 2v4M9 21H5a2 2 0 0 1-2-2v-4M21 15v4a2 2 0 0 1-2 2h-4M3 9V5a2 2 0 0 1 2-2h4"/><path d="M8 12h8"/></svg>
+          <span>Join session</span>
+        </button>
+        <button type="button" class="home-tile" id="btn-clone-git">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 18h14"/></svg>
+          <span>Clone with git</span>
+        </button>
+        <button type="button" class="home-tile" id="btn-add-friends">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 11a3 3 0 1 0-2.8-4M8 13a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3.5 19a4.5 4.5 0 0 1 9 0M14.5 14.5H21M17.75 11.25v6.5"/></svg>
+          <span>Add friends</span>
+        </button>
+      </div>
+
+      <p id="home-error" class="home-error" hidden></p>
+
+      <section class="home-recent hidden" id="home-recent">
+        <div class="home-recent-head">
+          <span>Recent projects</span>
+          <span class="home-recent-count" id="projects-count">0</span>
+        </div>
+        <div id="project-list" class="home-recent-list"></div>
+      </section>
+    </div>
+
+    <!-- New project -->
+    <div class="home-modal hidden" id="modal-new-project" role="dialog" aria-label="New project">
+      <button type="button" class="home-modal-backdrop" data-close-modal></button>
+      <div class="home-modal-card">
+        <div class="home-modal-head">
+          <h2>New project</h2>
+          <button type="button" class="icon-flat" data-close-modal aria-label="Cerrar">×</button>
+        </div>
+        <p class="home-hint">Crea un proyecto vacío dentro de AGDSE (carpeta nueva en <code>projects/</code>).</p>
+        <form id="new-project-form" class="home-row">
+          <input id="new-project-name" type="text" maxlength="60" placeholder="Nombre del proyecto" autocomplete="off" required />
+          <button type="submit" class="btn-primary">Crear</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Join session -->
+    <div class="home-modal hidden" id="modal-join" role="dialog" aria-label="Join session">
+      <button type="button" class="home-modal-backdrop" data-close-modal></button>
+      <div class="home-modal-card">
+        <div class="home-modal-head">
+          <h2>Join session</h2>
+          <button type="button" class="icon-flat" data-close-modal aria-label="Cerrar">×</button>
+        </div>
+        <p class="home-hint">Entrá el código de invitación del proyecto.</p>
+        <form id="join-form" class="home-row">
+          <input id="join-code" type="text" maxlength="8" placeholder="Código" autocomplete="off" spellcheck="false" />
+          <button type="submit" class="btn-primary">Entrar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Clone git -->
+    <div class="home-modal hidden" id="modal-clone" role="dialog" aria-label="Clone with git">
+      <button type="button" class="home-modal-backdrop" data-close-modal></button>
+      <div class="home-modal-card">
+        <div class="home-modal-head">
+          <h2>Clone with git</h2>
+          <button type="button" class="icon-flat" data-close-modal aria-label="Cerrar">×</button>
+        </div>
+        <p class="home-hint">Cloná un repositorio HTTPS en un proyecto nuevo. Necesitás una cuenta.</p>
+        <form id="clone-form" class="auth-form">
+          <input id="clone-url" type="url" placeholder="https://github.com/org/repo.git" autocomplete="off" spellcheck="false" required />
+          <input id="clone-name" type="text" maxlength="60" placeholder="Nombre del proyecto (opcional)" autocomplete="off" />
+          <button type="submit" class="btn-primary" id="clone-submit">Clonar</button>
+        </form>
+        <pre id="clone-log" class="pkg-log hidden" aria-live="polite"></pre>
+      </div>
+    </div>
+
+    <!-- Friends panel -->
+    <div class="home-modal hidden" id="modal-friends" role="dialog" aria-label="Add friends">
+      <button type="button" class="home-modal-backdrop" data-close-modal></button>
+      <div class="home-modal-card">
+        <div class="home-modal-head">
+          <h2>Add friends</h2>
+          <button type="button" class="icon-flat" data-close-modal aria-label="Cerrar">×</button>
+        </div>
+        <div id="friends-need-account" class="home-hint">
+          Necesitás una cuenta para agregar amigos.
+          <button type="button" class="home-link" id="btn-friends-to-account">Crear cuenta</button>
+        </div>
+        <div id="friends-home" class="friends-home hidden">
+          <form id="friend-request-form" class="home-row">
+            <input id="friend-name" type="text" maxlength="24" placeholder="Nombre de usuario" autocomplete="off" />
+            <button type="submit" class="btn-primary">Agregar</button>
+          </form>
+          <div class="explorer-label">PENDIENTES</div>
+          <div id="pending-list" class="home-list"></div>
+          <div class="explorer-label">AMIGOS</div>
+          <div id="friends-list" class="home-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account panel -->
+    <div class="home-modal hidden" id="modal-account" role="dialog" aria-label="Account">
+      <button type="button" class="home-modal-backdrop" data-close-modal></button>
+      <div class="home-modal-card">
+        <div class="home-modal-head">
+          <h2>Account</h2>
+          <button type="button" class="icon-flat" data-close-modal aria-label="Cerrar">×</button>
+        </div>
+        <div id="auth-guest" class="auth-block">
+          <p class="home-hint">Por defecto sos Guest. Creá una cuenta para amigos y proyectos propios.</p>
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab active" data-auth="register">Crear cuenta</button>
+            <button type="button" class="auth-tab" data-auth="login">Entrar</button>
+          </div>
+          <form id="register-form" class="auth-form">
+            <input id="reg-name" type="text" maxlength="24" placeholder="Nombre" autocomplete="username" required />
+            <input id="reg-password" type="password" maxlength="64" placeholder="Password" autocomplete="new-password" required />
+            <div class="color-row" id="reg-colors" aria-label="Color"></div>
+            <button type="submit" class="btn-primary">Crear cuenta</button>
+          </form>
+          <form id="login-form" class="auth-form hidden">
+            <input id="login-name" type="text" maxlength="24" placeholder="Nombre" autocomplete="username" required />
+            <input id="login-password" type="password" maxlength="64" placeholder="Password" autocomplete="current-password" required />
+            <button type="submit" class="btn-primary">Entrar</button>
+          </form>
+        </div>
+        <div id="auth-account" class="auth-block hidden">
+          <p class="home-hint">Sesión iniciada como <strong id="account-name-label">—</strong>.</p>
+          <button type="button" id="btn-logout" class="btn-ghost">Cerrar sesión (Guest)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="app hidden" id="editor-app">
     <nav class="activity" aria-label="Actividad">
+      <button type="button" class="activity-logo" id="btn-home" title="Home">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="AGDSE" width="28" height="28" />
+      </button>
       <button type="button" class="activity-btn active" id="btn-explorer" title="Explorer" aria-pressed="true">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"/></svg>
+      </button>
+      <button type="button" class="activity-btn" id="btn-friends" title="Amigos" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 11a3 3 0 1 0-2.8-4M8 13a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3.5 19a4.5 4.5 0 0 1 9 0M13 19a4 4 0 0 1 7.5-2"/></svg>
+      </button>
+      <button type="button" class="activity-btn" id="btn-canvas" title="Canvas" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 15l2.5-3 2 2L16 9"/></svg>
       </button>
       <button type="button" class="activity-btn" id="btn-packages" title="Descargas" aria-pressed="false">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 18h14"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 18h14"/></svg>
       </button>
       <button type="button" class="activity-btn" id="btn-chat-rail" title="Chat" aria-pressed="false">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5V13a2.5 2.5 0 0 1-2.5 2.5H12l-4 3.5V15.5H7.5A2.5 2.5 0 0 1 5 13V6.5Z"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5V13a2.5 2.5 0 0 1-2.5 2.5H12l-4 3.5V15.5H7.5A2.5 2.5 0 0 1 5 13V6.5Z"/></svg>
+        <span class="activity-badge hidden" id="chat-unread-badge" aria-label="Mensajes sin leer"></span>
       </button>
       <div class="activity-spacer"></div>
-      <div class="activity-user" id="activity-user" title="Tu color"></div>
+      <div class="activity-foot">
+        <span class="activity-vault" id="activity-project" title="Proyecto">—</span>
+        <div class="activity-user avatar" id="activity-user" title="Tu color"></div>
+      </div>
     </nav>
 
     <aside class="side-left" id="side-left">
       <div class="explorer" id="explorer">
         <div class="panel-head">
-          <span>Explorer</span>
+          <span>Files</span>
           <div class="panel-actions">
-            <button type="button" id="btn-new" class="icon-flat" title="Nuevo notebook">+</button>
+            <button type="button" id="btn-new" class="icon-flat" title="Nuevo notebook">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
             <button type="button" id="btn-upload" class="icon-flat" title="Cargar carpeta">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V7m0 0 3.5 3.5M12 7 8.5 10.5M5 18h14"/></svg>
             </button>
             <input id="folder-input" type="file" webkitdirectory multiple hidden />
           </div>
         </div>
-        <div class="explorer-label">WORKSPACE</div>
+        <div class="explorer-label">PROJECT</div>
         <nav id="tree" class="tree" aria-label="Archivos"></nav>
+      </div>
+
+      <div class="friends-panel" id="friends-panel">
+        <div class="panel-head"><span>Amigos</span></div>
+        <div class="friends-body">
+          <div class="explorer-label">INVITE CODE</div>
+          <div class="invite-row">
+            <code id="invite-code-display">———</code>
+            <button type="button" id="btn-copy-code" class="btn-ghost">Copiar</button>
+            <button type="button" id="btn-regen-code" class="btn-ghost hidden">Regen</button>
+          </div>
+          <div class="explorer-label">EN ESTE PROYECTO</div>
+          <div id="project-peers" class="home-list"></div>
+          <div id="friends-invite-block" class="hidden">
+            <div class="explorer-label">INVITAR AMIGO</div>
+            <div id="friends-invite-list" class="home-list"></div>
+          </div>
+        </div>
       </div>
 
       <div class="packages" id="packages">
         <div class="panel-head">
-          <span>Descargas</span>
+          <span>Packages</span>
         </div>
         <div class="packages-body">
           <p class="packages-hint">Kernel en <code>kernel_venv</code>. Clickeá un paquete o escribí el nombre.</p>
@@ -63,36 +254,53 @@
     </aside>
 
     <section class="workspace">
-      <header class="topbar">
-        <div class="crumbs">
-          <span class="brand-inline">AGDSE</span>
-          <span class="sep">/</span>
-          <span id="path-label" class="crumb-path">—</span>
-        </div>
-        <div class="topbar-right">
-          <input id="title" class="title-input" type="text" maxlength="80" spellcheck="false" placeholder="Título" />
+      <header class="topbar" id="topbar">
+        <div class="tabs" id="tabs" role="tablist" aria-label="Archivos abiertos"></div>
+        <button type="button" id="btn-tab-add" class="tab-add" title="Nuevo notebook">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div class="topbar-trail">
           <input id="name" class="name-input" type="text" maxlength="24" placeholder="Tu nombre" autocomplete="off" />
-          <button type="button" id="btn-restart" class="btn-ghost" title="Reiniciar kernel">Kernel</button>
         </div>
       </header>
 
-      <div class="tabs" id="tabs">
-        <div class="tab active" id="tab-current">
-          <span id="tab-name">intro.agdnb</span>
+      <div class="view-header">
+        <div class="view-nav">
+          <button type="button" class="icon-flat" id="btn-restart" title="Reiniciar kernel">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4.5 12a7.5 7.5 0 0 1 12.7-5.4M19.5 12a7.5 7.5 0 0 1-12.7 5.4"/><path d="M17.5 4.5v4h-4M6.5 19.5v-4h4"/></svg>
+          </button>
+        </div>
+        <input id="title" class="title-input" type="text" maxlength="80" spellcheck="false" placeholder="Sin título" />
+        <div class="view-meta">
+          <span id="path-label" class="crumb-path">—</span>
         </div>
       </div>
 
       <main class="editor" id="sheet">
         <div id="cells" class="cells"></div>
-        <button type="button" id="btn-add-end" class="add-cell">Add cell</button>
+        <div class="add-cell-row">
+          <button type="button" id="btn-add-end" class="add-cell">Add code</button>
+          <button type="button" id="btn-add-md" class="add-cell">Add markdown</button>
+        </div>
         <div id="preview" class="preview hidden"></div>
+        <div id="board" class="board hidden">
+          <div class="board-toolbar">
+            <button type="button" class="board-tool active" data-board-tool="pen" title="Dibujar">Draw</button>
+            <button type="button" class="board-tool" data-board-tool="eraser" title="Borrar">Erase</button>
+            <button type="button" class="board-tool" id="btn-board-undo" title="Deshacer (Ctrl+Z)">Undo</button>
+            <span class="board-hint">Ctrl+Z deshace tu último trazo</span>
+          </div>
+          <div class="board-stage">
+            <canvas id="board-canvas" width="1200" height="800"></canvas>
+          </div>
+        </div>
       </main>
 
       <footer class="statusbar">
         <div id="roster" class="status-peers"></div>
         <div class="status-right">
-          <span id="status-kind">.agdnb</span>
-          <span id="status-lang">Python</span>
+          <span id="status-kind" class="status-pill">.ipynb</span>
+          <span id="status-lang" class="status-pill">Python</span>
         </div>
       </footer>
     </section>
@@ -106,15 +314,22 @@
       </div>
       <div class="chat-body">
         <div id="chat-log" class="chat-log" aria-live="polite"></div>
-        <form id="chat-form" class="chat-form">
-          <input id="chat-input" type="text" maxlength="500" placeholder="Message…" autocomplete="off" />
-          <button type="submit" class="btn-primary">Send</button>
-        </form>
+        <div class="chat-compose">
+          <div id="chat-mention-menu" class="mention-menu hidden" role="listbox" aria-label="Menciones"></div>
+          <form id="chat-form" class="chat-form">
+            <input id="chat-input" type="text" maxlength="500" placeholder="Message…  @usuario o @archivo" autocomplete="off" />
+            <button type="submit" class="btn-primary">Send</button>
+          </form>
+        </div>
       </div>
     </aside>
   </div>
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
   <script src="{{ url_for('static', filename='client.js') }}"></script>
 </body>
 </html>
