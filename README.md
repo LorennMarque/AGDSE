@@ -27,3 +27,23 @@ Los archivos de cada proyecto viven en `projects/<id>/`. Cuentas y metadata en `
 
 - `Ctrl/Cmd + Enter` en una celda: ejecutar
 - Run / + / Eliminar en la barra de cada celda
+
+## Capturas
+
+**Pantalla de inicio** — entrás como Guest o con tu cuenta, y desde ahí creás proyectos o te unís a uno.
+
+![Pantalla de inicio de AGDSE](docs/media/home.jpg)
+
+**Editor de notebooks** — celdas de código con su salida, chat del proyecto y cursores de los demás colaboradores en vivo.
+
+![Editor de notebooks colaborativo](docs/media/editor.jpg)
+
+**Invitación a un proyecto** — cada proyecto tiene un código de invitación para sumar colaboradores al toque.
+
+![Panel de código de invitación y colaboradores](docs/media/invitacion.jpg)
+
+## Demo: dos personas editando a la vez
+
+El siguiente GIF muestra a dos usuarios (`TestRunner` y `Ana`) conectados al mismo proyecto desde dos sesiones distintas: uno manda un mensaje por el chat, agrega una celda y la ejecuta, y todo eso aparece al instante en la pantalla del otro, junto con su cursor en vivo.
+
+![Demo de colaboración en tiempo real entre dos usuarios](docs/media/colaboracion-en-vivo.gif)
